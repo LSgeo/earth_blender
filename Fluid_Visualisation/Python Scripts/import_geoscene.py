@@ -41,8 +41,7 @@ from bpy.props import (BoolProperty,
                        EnumProperty,
                        CollectionProperty
                        )
-def tif_2_plane(file_name):
-    return
+
 
 
 
