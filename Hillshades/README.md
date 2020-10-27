@@ -9,7 +9,7 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
      > In QGIS: *Raster>Conversion>Translate (Convert Format)*, and under *Advanced>Additional command-line parameters*, insert `-scale <your_data_min>, <your_data_max>, 0, 65535`, then select *Output Data type*: *UInt16*)
  
     a. If you are using the same data for the surface colouring:  
-        i. Apply a colour map [Use Perceptually Uniform Colour Maps](https://peterkovesi.com/projects/colourmaps/index.html)
+        i. Apply a colour map. [I recommened Perceptually Uniform Colour Maps](https://peterkovesi.com/projects/colourmaps/index.html)
         
     b. If you are using a seperate dataset for the surface colouring:  
         i. Apply a colour map  
@@ -28,10 +28,10 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
     a. Familiarise yourself with the node view for Blender.  
     ![node layout of hillshades.blend](https://github.com/LSgeo/earth_blender/blob/hillshades/Data/Repo_Resources/hillshades_nodes.png)
 3. Load the data layer used for the surface colouring in the *colourmap_file* node (upper orange box)  
+     a. The surface colour file needs to be sRGB (3 channel, 0-255)
 4. Load the data layer used for the 3D displacement in the *displacement_file* node (lower orange box)  
      a. Change the *Color Space* of the displacement map to *Raw*  
      b. The hillshade needs to be using raw data values, normalised as an unsigned 16 bit integer (1 channel, 0-65535)    
-     c. The surface colour file needs to be sRGB (3 channel, 0-255)
 5. Adjust the *Scale* parameter in the *Displacement* node (purple box) until the heightmap is suitably scaled for your data. 
 6. Adjust remaining settings for the green texture box to adjust the appearance of the rendered surface.
 7. Adjust scene *Render Properties* (camera icon in right hand menu) to set the *Render Engine* to *Cycles* and *Feature Set* to *Experimental*. Optionally set Device to GPU Compute.
