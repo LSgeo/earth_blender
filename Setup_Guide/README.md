@@ -54,7 +54,7 @@ Navigate to the blender install directory where X.XX is the blender version numb
 >C:\Program Files\Blender Foundation\Blender X.XX\X.XX\python\bin
 
 When in this directory copy the downloaded files in.
-Hold shift and right click and open a windows powershell prompt here.
+Open a windows command prompt here, with administrative permissions.
 Then run the following three commands, where the file name is replaced with your downloaded files:
 
 >python.exe -m pip install NUMPY_FILENAME.whl
