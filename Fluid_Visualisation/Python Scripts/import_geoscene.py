@@ -41,6 +41,9 @@ from bpy.props import (BoolProperty,
                        EnumProperty,
                        CollectionProperty
                        )
+def tif_2_plane(file_name):
+    return
+
 
 
 class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
@@ -53,7 +56,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
     filename_ext = ".obj"
 
     filter_glob: StringProperty(
-        default= "*.tif,*.obj",
+        default= "*.tif;*.obj",
         options={'HIDDEN'},
     )
 
@@ -185,27 +188,33 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
         # iterate through the selected files
         for j, i in enumerate(self.files):
-
+            
             # generate full path to file
             path_to_file = (os.path.join(folder, i.name))
 
-            # call obj operator and assign ui values
-            bpy.ops.import_scene.obj(filepath=path_to_file,
-                                     axis_forward=self.axis_forward_setting,
-                                     axis_up=self.axis_up_setting,
-                                     use_edges=self.edges_setting,
-                                     use_smooth_groups=self.smooth_groups_setting,
-                                     use_split_objects=self.split_objects_setting,
-                                     use_split_groups=self.split_groups_setting,
-                                     use_groups_as_vgroups=self.groups_as_vgroups_setting,
-                                     use_image_search=self.image_search_setting,
-                                     split_mode=self.split_mode_setting,
-                                     global_clight_size=self.clamp_size_setting)
+            _, file_ext = os.path.splitext(path_to_file)
+            
+            if file_ext==".tif": 
+                print('fart')
 
-            if self.center_origin:
-                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-            bpy.ops.transform.resize(value=(self.scale_setting, self.scale_setting, self.scale_setting), constraint_axis=(False, False, False))
-            bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+            if file_ext==".obj":     
+                # call obj operator and assign ui values
+                bpy.ops.import_scene.obj(filepath=path_to_file,
+                                         axis_forward=self.axis_forward_setting,
+                                         axis_up=self.axis_up_setting,
+                                         use_edges=self.edges_setting,
+                                         use_smooth_groups=self.smooth_groups_setting,
+                                         use_split_objects=self.split_objects_setting,
+                                         use_split_groups=self.split_groups_setting,
+                                         use_groups_as_vgroups=self.groups_as_vgroups_setting,
+                                         use_image_search=self.image_search_setting,
+                                         split_mode=self.split_mode_setting,
+                                         global_clight_size=self.clamp_size_setting)
+
+                if self.center_origin:
+                    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+                bpy.ops.transform.resize(value=(self.scale_setting, self.scale_setting, self.scale_setting), constraint_axis=(False, False, False))
+                bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         return {'FINISHED'}
 
 
