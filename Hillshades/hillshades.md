@@ -28,11 +28,11 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
     a. Familiarise yourself with the node view for Blender.  
     ![node layout of hillshades.blend](https://github.com/LSgeo/earth_blender/blob/hillshades/Data/Repo_Resources/hillshades_nodes.png)
 3. Load the data layer used for the surface colouring in the *colourmap_file* node (upper orange box)  
-4. Load the data layer used for the 3D displacement in the *displacement_file* node (lower orange box)
-     a. Change the *color space* of the displacement map to *Raw*
-     b. The hillshade needs to be using raw data values, normalised as an unsigned 16 bit integer (1 channel, 0-65535)  
+4. Load the data layer used for the 3D displacement in the *displacement_file* node (lower orange box)  
+     a. Change the *Color Space* of the displacement map to *Raw*  
+     b. The hillshade needs to be using raw data values, normalised as an unsigned 16 bit integer (1 channel, 0-65535)    
      c. The surface colour file needs to be sRGB (3 channel, 0-255)
-5. Adjust the *scale* parameter in the *Displacement* node (purple box) until the heightmap is suitably scaled for your data. 
+5. Adjust the *Scale* parameter in the *Displacement* node (purple box) until the heightmap is suitably scaled for your data. 
 6. Adjust remaining settings for the green texture box to adjust the appearance of the rendered surface.
 7. Adjust scene *Render Properties* (camera icon in right hand menu) to set the *Render Engine* to *Cycles* and *Feature Set* to *Experimental*. Optionally set Device to GPU Compute.
 8. Process the render using the Render drop down menu (or press F12)
