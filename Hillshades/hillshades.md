@@ -21,7 +21,9 @@ You can visualise a single data layer, coloured using a colourmap, or integrate 
      > In QGIS: *Export>Save as>Rendered Image*
 
 5. Adjust the *scale* parameter in the *Displacement* node (purple box) until the heightmap is suitably scaled for your data. 
-6. Set camera and render settings, and process the render using the Render drop down menu (or press F12)
+6. Adjust remaining settings for the green texture box to adjust the appearance of the rendered surface.
+7. Adjust scene *Render Properties* (camera icon in right hand menu) to set the *Render Engine* to *Cycles* and *Feature Set* to *Experimental*. Optionally set Device to GPU Compute.
+8. Process the render using the Render drop down menu (or press F12)
 
 
 ## Notes:
