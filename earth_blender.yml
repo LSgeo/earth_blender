@@ -1,30 +1,11 @@
 name: earth_blender
 channels:
   - anaconda
-  - conda-forge
-  - viscid-hub
-  - intel
   - defaults
 dependencies:
-  - ca-certificates=2020.10.14=0
-  - certifi=2020.6.20=py37_0
-  - intel-openmp=2020.3=intel_311
-  - intelpython=2020.4=0
-  - libblas=3.8.0=20_mkl
-  - libcblas=3.8.0=20_mkl
-  - liblapack=3.8.0=20_mkl
-  - mkl=2020.2=256
-  - numpy=1.19.2=py37he804e03_1
-  - openssl=1.1.1h=he774522_0
-  - pip=20.2.4=py37_0
-  - python=3.7.7=h81c818b_4
-  - python_abi=3.7=1_cp37m
-  - setuptools=50.3.0=py37h9490d1a_1
-  - sqlite=3.33.0=vc14h5832a3a_1
-  - vc=14.1=h0510ff6_4
-  - vs2015_runtime=14.16.27012=hf0eaf9b_3
-  - wheel=0.35.1=py_0
-  - wincertstore=0.2=py37_0
+  - numpy=1.19
+  - pip=20.2
+  - python=3.7
   - pip:
     - bpy==2.82.1
-prefix: C:\Users\22566465\Miniconda3\envs\earth_blender
+
