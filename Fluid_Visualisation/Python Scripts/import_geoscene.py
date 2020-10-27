@@ -31,6 +31,7 @@ bl_info = {
 
 
 import bpy
+import rasterio
 import os
 
 from bpy_extras.io_utils import ImportHelper
@@ -43,6 +44,57 @@ from bpy.props import (BoolProperty,
                        )
 
 
+
+def create_custom_mesh(file_name):
+    raster = rasterio.open(file_name)
+    obj_name = raster.name.split(sep='/')[-1] # set object name to file name
+    r_bounds = list(dataset.bounds) # get tif bounds
+    
+    # Define arrays for holding data    
+    myvertex = []
+    myfaces = []
+
+    # Create all Vertices
+    # vertex 0
+    mypoint = [(r_bounds[0], r_bounds[1], 0.0)]
+    myvertex.extend(mypoint)
+
+    # vertex 1
+    mypoint = [(r_bounds[2], r_bounds[1], 0.0)]
+    myvertex.extend(mypoint)
+
+    # vertex 2
+    mypoint = [(r_bounds[0], r_bounds[3], 0.0)]
+    myvertex.extend(mypoint)
+
+    # vertex 3
+    mypoint = [(r_bounds[2], r_bounds[3], 0.0)]
+    myvertex.extend(mypoint)
+
+    # -------------------------------------
+    # Create all Faces
+    # -------------------------------------
+    myface = [(0, 1, 3, 2)]
+    myfaces.extend(myface)
+
+
+    mymesh = bpy.data.meshes.new(objname)
+
+    myobject = bpy.data.objects.new(objname, mymesh)
+
+    bpy.context.scene.objects.link(myobject)
+
+    # Generate mesh data
+    mymesh.from_pydata(myvertex, [], myfaces)
+    # Calculate the edges
+    mymesh.update(calc_edges=True)
+
+    # Set Location
+    myobject.location.x = px
+    myobject.location.y = py
+    myobject.location.z = pz
+
+    return(myobject)
 
 
 class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
@@ -194,7 +246,8 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             _, file_ext = os.path.splitext(path_to_file)
             
             if file_ext==".tif": 
-                print('fart')
+                obj = create_custom_mesh(path_to_file)
+
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
