@@ -45,56 +45,7 @@ from bpy.props import (BoolProperty,
 
 
 
-def create_custom_mesh(file_name):
-    raster = rasterio.open(file_name)
-    obj_name = raster.name.split(sep='/')[-1] # set object name to file name
-    r_bounds = list(dataset.bounds) # get tif bounds
-    
-    # Define arrays for holding data    
-    myvertex = []
-    myfaces = []
 
-    # Create all Vertices
-    # vertex 0
-    mypoint = [(r_bounds[0], r_bounds[1], 0.0)]
-    myvertex.extend(mypoint)
-
-    # vertex 1
-    mypoint = [(r_bounds[2], r_bounds[1], 0.0)]
-    myvertex.extend(mypoint)
-
-    # vertex 2
-    mypoint = [(r_bounds[0], r_bounds[3], 0.0)]
-    myvertex.extend(mypoint)
-
-    # vertex 3
-    mypoint = [(r_bounds[2], r_bounds[3], 0.0)]
-    myvertex.extend(mypoint)
-
-    # -------------------------------------
-    # Create all Faces
-    # -------------------------------------
-    myface = [(0, 1, 3, 2)]
-    myfaces.extend(myface)
-
-
-    mymesh = bpy.data.meshes.new(objname)
-
-    myobject = bpy.data.objects.new(objname, mymesh)
-
-    bpy.context.scene.objects.link(myobject)
-
-    # Generate mesh data
-    mymesh.from_pydata(myvertex, [], myfaces)
-    # Calculate the edges
-    mymesh.update(calc_edges=True)
-
-    # Set Location
-    myobject.location.x = px
-    myobject.location.y = py
-    myobject.location.z = pz
-
-    return(myobject)
 
 
 class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
@@ -201,6 +152,58 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         name="Center Origin",
         default=True
     )
+    
+    def create_custom_mesh(self,file_name):
+        raster = rasterio.open(file_name)
+        objname = raster.name.split(sep='/')[-1] # set object name to file name
+        r_bounds = list(raster.bounds) # get tif bounds
+
+        # Define arrays for holding data    
+        myvertex = []
+        myfaces = []
+
+        # Create vertices from geotiff bounds
+        myvertex.extend([(r_bounds[0], r_bounds[1], 0.0)])
+        myvertex.extend([(r_bounds[2], r_bounds[1], 0.0)])
+        myvertex.extend([(r_bounds[0], r_bounds[3], 0.0)])
+        myvertex.extend([(r_bounds[2], r_bounds[3], 0.0)])
+
+        # Create all Faces
+        myface = [(0, 1, 3, 2)]
+        myfaces.extend(myface)
+
+        mymesh = bpy.data.meshes.new(objname)
+        myobject = bpy.data.objects.new(objname, mymesh)
+        mymesh.from_pydata(myvertex, [], myfaces)
+        mymesh.update(calc_edges=True)
+
+        ## load image as texture
+        
+        
+        # define a new material
+        mat = bpy.data.materials.new(name=objname) # name it based on the image used to make it
+        mat.use_nodes = True
+        
+        # get all the material nodes
+        mat_nodes = mat.node_tree.nodes
+        
+        # make some nodes
+        texPbsdf = mat_nodes.new("Principled BSDF")
+        texImage = mat_nodes.new('ShaderNodeTexImage')
+        texMappi = mat_nodes.new('ShaderNodeMapping')
+        texCoord = mat_nodes.new('ShaderNodeTexCoord')
+            
+        # link the nodes
+        mat.node_tree.links.new(texPbsdf.inputs['Base Color'], texImage.outputs['Color'])
+        mat.node_tree.links.new(texImage.inputs['Vector'], texMappi.outputs['Vector'])
+        mat.node_tree.links.new(texMappi.inputs['Vector'], texCoord.outputs['Object'])
+        
+        # populate our nodes fields as necessary using math and other things
+        #texImage.image = bpy.data.images.load(file_name)
+
+        # assign to our object
+        myobject.data.materials.append(mat)
+        return(myobject)
 
     def draw(self, context):
         layout = self.layout
@@ -245,9 +248,17 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
             _, file_ext = os.path.splitext(path_to_file)
             
+            #tif_obj = [
+            
+            
             if file_ext==".tif": 
-                obj = create_custom_mesh(path_to_file)
-
+                myobj = self.create_custom_mesh(str(path_to_file))
+                #tif_obj.append(obj)
+                myobj.location.x = 0
+                myobj.location.y = 0
+                myobj.location.z = 0
+                scene = context.scene
+                scene.collection.objects.link(myobj)
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
@@ -265,6 +276,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
                 if self.center_origin:
                     bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+                
                 bpy.ops.transform.resize(value=(self.scale_setting, self.scale_setting, self.scale_setting), constraint_axis=(False, False, False))
                 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         return {'FINISHED'}
