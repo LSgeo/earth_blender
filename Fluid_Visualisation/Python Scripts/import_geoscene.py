@@ -267,8 +267,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         r_objs = []
         r_rios = []
         
-        geo_objs = []
-        
         
         # iterate through the selected files
         for j, i in enumerate(self.files):
@@ -281,21 +279,27 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             # load tifs
             if file_ext==".tif": 
                 myobj,raster = self.create_custom_mesh(str(path_to_file))
+                scene = context.scene
+                scene.collection.objects.link(myobj)
+                #bpy.ops.object.select_all(action='DESELECT')
+                #bpy.data.objects[myobj.name].select_set(True)
+                #
+                # append to list for other processing
                 r_objs.append(myobj)
                 r_rios.append(raster)
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
-                geo_obj = bpy.ops.import_scene.obj(filepath=path_to_file)
-                geo_objs.append(geo_obj)
+                bpy.ops.import_scene.obj(filepath=path_to_file)
+                #bpy.ops.object.select_all(action='DESELECT')
+                #bpy.data.objects[geo_obj.name].select_set(True)
+                #bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+                # append to list for other processing
                                          
-            # add to scene
-            for robj in r_objs:
-                scene = context.scene
-                scene.collection.objects.link(robj)
-                bpy.data.objects[robj.name].select_set(True)
-                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-            
+            # other processing 
+            bpy.ops.object.select_all(action='DESELECT')     
+            obj_objects = bpy.context.selected_objects[:]  
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
 
         return {'FINISHED'}
 
