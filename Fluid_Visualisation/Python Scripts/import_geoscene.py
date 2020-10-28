@@ -224,11 +224,13 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         texMappi.inputs[1].default_value = (w_loc,h_loc,0) # location
         texMappi.inputs[3].default_value = ((w_scale/iw),(h_scale/ih),0) # scale
         
+        # we'll need to scale based on dave's stuff here or after the object is returned
         myobject.scale.x = (w_scale/100)
         myobject.scale.y = (h_scale/100)
 
         # assign to our object
         myobject.data.materials.append(mat)
+        
         return(myobject)
 
     def draw(self, context):
@@ -273,18 +275,16 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             path_to_file = (os.path.join(folder, i.name))
 
             _, file_ext = os.path.splitext(path_to_file)
-            
-            #tif_obj = [
-            
+                    
             
             if file_ext==".tif": 
                 myobj = self.create_custom_mesh(str(path_to_file))
                 #tif_obj.append(obj)
-                myobj.location.x = 0
-                myobj.location.y = 0
-                myobj.location.z = 0
                 scene = context.scene
                 scene.collection.objects.link(myobj)
+                bpy.data.objects[myobj.name].select_set(True)
+                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+                
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
