@@ -33,6 +33,7 @@ bl_info = {
 import bpy
 import rasterio
 import os
+import math
 
 from bpy_extras.io_utils import ImportHelper
 
@@ -188,7 +189,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         mat_nodes = mat.node_tree.nodes
         
         # make some nodes
-        texPbsdf = mat_nodes.new("Principled BSDF")
+        texPbsdf = mat_nodes["Principled BSDF"]
         texImage = mat_nodes.new('ShaderNodeTexImage')
         texMappi = mat_nodes.new('ShaderNodeMapping')
         texCoord = mat_nodes.new('ShaderNodeTexCoord')
@@ -199,7 +200,11 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         mat.node_tree.links.new(texMappi.inputs['Vector'], texCoord.outputs['Object'])
         
         # populate our nodes fields as necessary using math and other things
-        #texImage.image = bpy.data.images.load(file_name)
+        texImage.image = bpy.data.images.load(file_name)
+        
+        texMappi.vector_type = "POINT"
+        texMappi.inputs[1].default_value = (10,10,10) # location
+        texMappi.inputs[3].default_value = (10,10,10) # scale
 
         # assign to our object
         myobject.data.materials.append(mat)
