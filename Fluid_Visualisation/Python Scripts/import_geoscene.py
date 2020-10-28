@@ -202,9 +202,30 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         # populate our nodes fields as necessary using math and other things
         texImage.image = bpy.data.images.load(file_name)
         
+        # we want to transform the texture in a way that makes sense for our plane
+        # thus we need two sets of dimensions
+        # image resolution
+        iw = raster.width
+        ih = raster.height
+        
+        # geo extent
+        rw = r_bounds[2] - r_bounds[0]
+        rh = r_bounds[3] - r_bounds[1]
+        
+        w_scale = iw/rw
+        h_scale = ih/rh
+
         texMappi.vector_type = "POINT"
-        texMappi.inputs[1].default_value = (10,10,10) # location
-        texMappi.inputs[3].default_value = (10,10,10) # scale
+        
+        # define bottom left point relative to center of geometry in blender units
+        w_loc = -iw/2
+        h_loc = -ih/2
+        
+        texMappi.inputs[1].default_value = (w_loc,h_loc,0) # location
+        texMappi.inputs[3].default_value = ((w_scale/iw),(h_scale/ih),0) # scale
+        
+        myobject.scale.x = (w_scale/100)
+        myobject.scale.y = (h_scale/100)
 
         # assign to our object
         myobject.data.materials.append(mat)
