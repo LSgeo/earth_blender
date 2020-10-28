@@ -219,10 +219,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         
         texMappi.inputs[1].default_value = (w_loc,h_loc,0) # location
         texMappi.inputs[3].default_value = ((w_scale/iw),(h_scale/ih),0) # scale
-        
-        # we'll need to scale based on dave's stuff here or after the object is returned
-        myobject.scale.x = (w_scale/100)
-        myobject.scale.y = (h_scale/100)
 
         # assign to our object
         myobject.data.materials.append(mat)
@@ -281,9 +277,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
                 myobj,raster = self.create_custom_mesh(str(path_to_file))
                 scene = context.scene
                 scene.collection.objects.link(myobj)
-                #bpy.ops.object.select_all(action='DESELECT')
-                #bpy.data.objects[myobj.name].select_set(True)
-                #
                 # append to list for other processing
                 r_objs.append(myobj)
                 r_rios.append(raster)
@@ -292,17 +285,27 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             if file_ext==".obj":     
                 # call obj operator and assign ui values
                 bpy.ops.import_scene.obj(filepath=path_to_file)
-                #bpy.ops.object.select_all(action='DESELECT')
-                #bpy.data.objects[geo_obj.name].select_set(True)
-                #bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-                # append to list for other processing
-                                         
-        # other processing 
-        obj_objects = bpy.context.scene.objects
+                                                         
+        ## other processing 
+        # origin setting
+        obj_objects = bpy.context.scene.objects # all objects
 
-        for obj in obj_objects:
-            bpy.data.objects[obj.name].select_set(True)
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+        
+        
+        item='MESH'
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_by_type(type=item)
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+        
+        
+        obj_obj = [x for x in obj_objects if x.name not in [y.name for y in r_objs]] 
+        
+        # dave dum gotta rotate objects
+        for obj in obj_obj:
+            obj.rotation_euler = (0,0,0)
+            
+        # scale things
+        bpy.ops.transform.resize(value=(0.0002,0.0002,0.0002))
 
         return {'FINISHED'}
 
