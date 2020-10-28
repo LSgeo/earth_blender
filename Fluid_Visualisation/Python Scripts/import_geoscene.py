@@ -268,7 +268,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         r_rios = []
         
         
-        # iterate through the selected files
+        # perform imports for all files
         for j, i in enumerate(self.files):
             
             # generate full path to file
@@ -287,7 +287,8 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
                 # append to list for other processing
                 r_objs.append(myobj)
                 r_rios.append(raster)
-
+            
+            # loading the objs
             if file_ext==".obj":     
                 # call obj operator and assign ui values
                 bpy.ops.import_scene.obj(filepath=path_to_file)
@@ -296,9 +297,11 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
                 #bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
                 # append to list for other processing
                                          
-            # other processing 
-            bpy.ops.object.select_all(action='DESELECT')     
-            obj_objects = bpy.context.selected_objects[:]  
+        # other processing 
+        obj_objects = bpy.context.scene.objects
+
+        for obj in obj_objects:
+            bpy.data.objects[obj.name].select_set(True)
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
 
         return {'FINISHED'}
