@@ -149,10 +149,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         default=1,
     )
 
-    center_origin: BoolProperty(
-        name="Center Origin",
-        default=True
-    )
     
     def create_custom_mesh(self,file_name):
         raster = rasterio.open(file_name)
@@ -231,7 +227,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         # assign to our object
         myobject.data.materials.append(mat)
         
-        return(myobject)
+        return(myobject,raster)
 
     def draw(self, context):
         layout = self.layout
@@ -267,7 +263,13 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
         # get the folder
         folder = (os.path.dirname(self.filepath))
-
+        
+        r_objs = []
+        r_rios = []
+        
+        geo_objs = []
+        
+        
         # iterate through the selected files
         for j, i in enumerate(self.files):
             
@@ -276,35 +278,25 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
             _, file_ext = os.path.splitext(path_to_file)
                     
-            
+            # load tifs
             if file_ext==".tif": 
-                myobj = self.create_custom_mesh(str(path_to_file))
-                #tif_obj.append(obj)
-                scene = context.scene
-                scene.collection.objects.link(myobj)
-                bpy.data.objects[myobj.name].select_set(True)
-                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-                
+                myobj,raster = self.create_custom_mesh(str(path_to_file))
+                r_obj.appemd(myobj)
+                r_rio.append(raster)
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
-                bpy.ops.import_scene.obj(filepath=path_to_file,
-                                         axis_forward=self.axis_forward_setting,
-                                         axis_up=self.axis_up_setting,
-                                         use_edges=self.edges_setting,
-                                         use_smooth_groups=self.smooth_groups_setting,
-                                         use_split_objects=self.split_objects_setting,
-                                         use_split_groups=self.split_groups_setting,
-                                         use_groups_as_vgroups=self.groups_as_vgroups_setting,
-                                         use_image_search=self.image_search_setting,
-                                         split_mode=self.split_mode_setting,
-                                         global_clight_size=self.clamp_size_setting)
+                geo_obj = bpy.ops.import_scene.obj(filepath=path_to_file)
+                geo_objs.append(geo_obj)
+                                         
+            # add to scene
+            for robj in r_objs:
+                scene = context.scene
+                scene.collection.objects.link(robj)
+                bpy.data.objects[robj.name].select_set(True)
+                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+            
 
-                if self.center_origin:
-                    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-                
-                bpy.ops.transform.resize(value=(self.scale_setting, self.scale_setting, self.scale_setting), constraint_axis=(False, False, False))
-                bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
         return {'FINISHED'}
 
 
