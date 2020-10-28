@@ -281,8 +281,8 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             # load tifs
             if file_ext==".tif": 
                 myobj,raster = self.create_custom_mesh(str(path_to_file))
-                r_obj.appemd(myobj)
-                r_rio.append(raster)
+                r_objs.append(myobj)
+                r_rios.append(raster)
 
             if file_ext==".obj":     
                 # call obj operator and assign ui values
