@@ -260,7 +260,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         row.prop(self, "center_origin")
 
     def execute(self, context):
-
+        C = bpy.context
         # get the folder
         folder = (os.path.dirname(self.filepath))
         
@@ -300,6 +300,22 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             bpy.ops.object.select_all(action='DESELECT')     
             obj_objects = bpy.context.selected_objects[:]  
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+        
+        for o in bpy.context.scene.objects: #Remove all lights and cameras - we make new ones
+            if o.type == 'CAMERA' or o.type == "LIGHT":
+                o.select_set(True)
+            else:
+                o.select_set(False)
+        
+        bpy.ops.object.delete()
+
+        #Add new sun and ortho camera at origin
+        bpy.ops.object.light_add(type="SUN", location=(0.0, 0.0, 10.0))
+        C.object.data.energy = 5  
+
+        bpy.ops.object.camera_add(location=(0.0, 0.0, 20.0))
+        C.object.data.type="ORTHO"
+
 
         return {'FINISHED'}
 
