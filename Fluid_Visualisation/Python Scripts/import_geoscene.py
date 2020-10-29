@@ -219,10 +219,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         
         texMappi.inputs[1].default_value = (w_loc,h_loc,0) # location
         texMappi.inputs[3].default_value = ((w_scale/iw),(h_scale/ih),0) # scale
-        
-        # we'll need to scale based on dave's stuff here or after the object is returned
-        myobject.scale.x = (w_scale/100)
-        myobject.scale.y = (h_scale/100)
 
         # assign to our object
         myobject.data.materials.append(mat)
