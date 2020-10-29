@@ -400,6 +400,7 @@ class import_hil_ras(bpy.types.Operator, ImportHelper):
             # load tifs
             if file_ext==".tif": 
                 myobj,raster = self.create_custom_mesh(str(path_to_file))
+
                 scene = context.scene
                 scene.collection.objects.link(myobj)
                 # append to list for other processing
@@ -411,7 +412,8 @@ class import_hil_ras(bpy.types.Operator, ImportHelper):
         bpy.ops.object.select_all(action='DESELECT')             
         bpy.ops.object.select_by_type(type=item)
         obs = context.selected_objects
-        for ob in obs:
+        raster = [x for x in obs if x.name in [r.name for r in r_objs]]
+        for ob in raster:
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
             ob.scale.x = 0.0002
             ob.scale.y = 0.0002
