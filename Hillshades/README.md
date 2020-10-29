@@ -26,7 +26,7 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
 
 1. Open the provided hillshades.blend file in Blender  
     a. Familiarise yourself with the node view for Blender.  
-    ![node layout of hillshades.blend](https://github.com/LSgeo/earth_blender/blob/hillshades/Data/Repo_Resources/hillshades_nodes.png)
+    ![node layout of hillshades.blend](https://github.com/LSgeo/earth_blender/blob/main/Data/Repo_Resources/hillshades_nodes.png)
 3. Load the data layer used for the surface colouring in the *colourmap_file* node (upper orange box)  
      a. The surface colour file needs to be sRGB (3 channel, 0-255)
 4. Load the data layer used for the 3D displacement in the *displacement_file* node (lower orange box)  
