@@ -9,12 +9,24 @@ clear all
 % c_lvls = 0:0.1425:1.0;
 
 addpath('./pktools/');
-L = shaperead('./shp/lineaments_clipped.shp');
+L_all = shaperead('./shp/lineaments_clipped.shp');
 %L = shaperead('./shp/gravity_worms_clipped.shp');   
 
-heights = unique([L(:).z_mean]);
-h_sort=sort(heights,'descend');
-all_z = [L(:).z_mean];
+
+all_z = [L_all(:).z_mean];
+
+heights_all = unique([L_all(:).z_mean]);
+h_sort_all=sort(heights_all,'descend');
+mid_point = floor(size(h_sort_all,2)/2);
+
+upper_hsort = 1:mid_point;
+lower_hsort = mid_point+1:size(h_sort_all,2);
+
+h_sort=lower_hsort;
+heights = h_sort_all(h_sort);
+
+L = L_all(find(all_z>h_sort_all(mid_point)));
+all_depths = [L(:).z_mean];
 
 scale_offset=1.2;
 scale_step =10;
@@ -37,7 +49,8 @@ G=[];
 O = zeros(bin_sizes);
 
 for idz=1:size(heights,2)
-    [H,c] = hist3([[L(find(all_z==h_sort(idz))).X]',[L(find(all_z==h_sort(idz))).Y]'],'Nbins',bin_sizes);
+    XY_data =  [[L(find(all_depths==heights(idz))).X]',[L(find(all_depths==heights(idz))).Y]'];
+    [H,c] = hist3([],'Nbins',bin_sizes);
     N = cat(3,N,H);
     bc(idz).bin_centers = c;
     I = imgaussfilt(H,sigmas(idz));
@@ -83,8 +96,8 @@ R = maprasterref('RasterSize', rasterSize, ...
           'XWorldLimits', x_wlimits);
 
 % O2 = rot90(fliplr(O));
-% figure;mapshow(O,R2);
-%figure;imagesc(O);ax=gca;ax.YDir='normal';
+% figure;mapshow(O,R);
+%figure;imagesc(O);ax=gca;ax.YDir='normal';colorbar
 
 % H1 = N(:,:,10);
 % L1 = L(find(all_z==h_sort(10)));
