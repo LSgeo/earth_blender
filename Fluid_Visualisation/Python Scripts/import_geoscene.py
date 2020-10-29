@@ -1,4 +1,4 @@
-# ##### BEGIN GPL LICENSE BLOCK #####
+ ##### BEGIN GPL LICENSE BLOCK #####
 #
 #  This program is free software; you can redistribute it and/or
 #  modify it under the terms of the GNU General Public License
@@ -31,9 +31,12 @@ bl_info = {
 
 
 import bpy
+from bpy import context
 import rasterio
 import os
 import math
+from mathutils import Vector, Matrix
+import numpy as np
 
 from bpy_extras.io_utils import ImportHelper
 
@@ -43,10 +46,6 @@ from bpy.props import (BoolProperty,
                        EnumProperty,
                        CollectionProperty
                        )
-
-
-
-
 
 
 class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
@@ -256,6 +255,8 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         row.prop(self, "center_origin")
 
     def execute(self, context):
+        obs = context.selected_objects
+        bpy.ops.object.delete()
         C = bpy.context
         # get the folder
         folder = (os.path.dirname(self.filepath))
@@ -283,25 +284,61 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
             
             # loading the objs
             if file_ext==".obj":     
-                # call obj operator and assign ui values
-                bpy.ops.import_scene.obj(filepath=path_to_file)
-                #bpy.ops.object.select_all(action='DESELECT')
-                #bpy.data.objects[geo_obj.name].select_set(True)
-                #bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-                # append to list for other processing
-                                         
-            # other processing 
-            bpy.ops.object.select_all(action='DESELECT')     
-            obj_objects = bpy.context.selected_objects[:]  
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+                bpy.ops.import_scene.obj(filepath=path_to_file)        
+                                       
+        ## other processing   
+        item='MESH'              
+        bpy.ops.object.select_by_type(type=item)
+        obs = context.selected_objects
         
+        scaling = 0.0002
+        for ob in obs:
+            orig_loc, orig_rot, orig_scale = ob.matrix_world.decompose()
+            orig_loc_mat   = Matrix.Translation(orig_loc)
+            orig_rot_mat   = orig_rot.to_matrix().to_4x4()
+            orig_scale_mat = (Matrix.Scale(scaling,4,(1,0,0)) @ Matrix.Scale(scaling,4,(0,1,0)) @ Matrix.Scale(scaling,4,(0,0,1)))
+            
+            ob.matrix_world = orig_loc_mat @ orig_rot_mat @ orig_scale_mat
+            ob.data.transform(ob.matrix_world)
+            ob.matrix_world = Matrix()
+            
+        # origin setting
+        obj_objects = bpy.context.scene.objects # all objects
+        
+        bpy.ops.object.select_all(action='DESELECT')
+        bpy.ops.object.select_by_type(type=item)
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+        
+        # move to 0,0 - this is old magic
+        obs = context.selected_objects
+        o_calc = sum((obj.matrix_world.translation for obj in obs),Vector()) / len(obs)         
+        
+        bpy.ops.object.empty_add(location=o_calc)
+        
+        mt = context.object
+        mwi = mt.matrix_world.inverted()
+
+        for ob in obs:
+            ob.parent = mt
+            # alter ob.matrix_local
+            ob.matrix_local = mwi @ ob.matrix_world
+
+        mt.location = (0, 0, 0)
+        bpy.data.objects.remove(mt)
+        
+        
+        #bpy.ops.transform.resize(value=(0.002,0.002,0.002))
+        #bpy.ops.object.transform_apply(scale=True)
+
+        # clear unneccesary objects
         for o in bpy.context.scene.objects: #Remove all lights and cameras - we make new ones
-            if o.type == 'CAMERA' or o.type == "LIGHT":
+            if o.type in ['CAMERA','LIGHT','EMPTY']:
                 o.select_set(True)
             else:
                 o.select_set(False)
         
         bpy.ops.object.delete()
+
 
         #Add new sun and ortho camera at origin
         bpy.ops.object.light_add(type="SUN", location=(0.0, 0.0, 10.0))
@@ -309,27 +346,7 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
         bpy.ops.object.camera_add(location=(0.0, 0.0, 20.0))
         C.object.data.type="ORTHO"
-
-                                                         
-        ## other processing 
-        # origin setting
-        obj_objects = bpy.context.scene.objects # all objects
-        item='MESH'
-        bpy.ops.object.select_all(action='DESELECT')
-        bpy.ops.object.select_by_type(type=item)
-        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
         
-        
-        obj_obj = [x for x in obj_objects if x.name not in [y.name for y in r_objs]] 
-        
-        # formatting for these objects is jank gotta rotate objects
-        for obj in obj_obj:
-            obj.rotation_euler = (0,0,0)
-            
-        # scale things
-        bpy.ops.transform.resize(value=(0.0002,0.0002,0.0002))
-        # snap them to center not that I know how
-
         return {'FINISHED'}
 
 
