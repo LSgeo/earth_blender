@@ -289,9 +289,6 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         ## other processing 
         # origin setting
         obj_objects = bpy.context.scene.objects # all objects
-
-        
-        
         item='MESH'
         bpy.ops.object.select_all(action='DESELECT')
         bpy.ops.object.select_by_type(type=item)
@@ -300,12 +297,13 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
         
         obj_obj = [x for x in obj_objects if x.name not in [y.name for y in r_objs]] 
         
-        # dave dum gotta rotate objects
+        # formatting for these objects is jank gotta rotate objects
         for obj in obj_obj:
             obj.rotation_euler = (0,0,0)
             
         # scale things
         bpy.ops.transform.resize(value=(0.0002,0.0002,0.0002))
+        # snap them to center not that I know how
 
         return {'FINISHED'}
 
