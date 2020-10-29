@@ -18,12 +18,12 @@
 # <pep8 compliant>
 
 bl_info = {
-    "name": "Import GeoScene",
-    "author": "Tasman, David, Luke, Lu",
+    "name": "Raster Hillshade Import",
+    "author": "Luke, Tasman, David, Lu",
     "version": (0, 1, 0),
     "blender": (2, 80, 0),
     "location": "File > Import-Export",
-    "description": "Import and scale multiple OBJ, and GeoRasters",
+    "description": "Import GeoRasters for Hillshade",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
@@ -48,17 +48,17 @@ from bpy.props import (BoolProperty,
                        )
 
 
-class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
+class raster_hill_import(bpy.types.Operator, ImportHelper):
     """This appears in the tooltip of the operator and in the generated docs"""
-    bl_idname = "import_scene.geo_scene"
-    bl_label = "Import Geo_Scene"
+    bl_idname = "import_scene.raster_hillshade"
+    bl_label = "Import Raster for Hillshade"
     bl_options = {'PRESET', 'UNDO'}
 
     # ImportHelper mixin class uses this
     filename_ext = ".obj"
 
     filter_glob: StringProperty(
-        default= "*.tif;*.obj",
+        default= "*.tif",
         options={'HIDDEN'},
     )
 
@@ -281,55 +281,20 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
                 # append to list for other processing
                 r_objs.append(myobj)
                 r_rios.append(raster)
-            
-            # loading the objs
-            if file_ext==".obj":     
-                bpy.ops.import_scene.obj(filepath=path_to_file)        
                                        
         ## other processing   
-        item='MESH'              
+        item='MESH'
+        bpy.ops.object.select_all(action='DESELECT')             
         bpy.ops.object.select_by_type(type=item)
         obs = context.selected_objects
-        
-        scaling = 0.0002
         for ob in obs:
-            orig_loc, orig_rot, orig_scale = ob.matrix_world.decompose()
-            orig_loc_mat   = Matrix.Translation(orig_loc)
-            orig_rot_mat   = orig_rot.to_matrix().to_4x4()
-            orig_scale_mat = (Matrix.Scale(scaling,4,(1,0,0)) @ Matrix.Scale(scaling,4,(0,1,0)) @ Matrix.Scale(scaling,4,(0,0,1)))
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+            ob.scale.x = 0.0002
+            ob.scale.y = 0.0002
+            ob.location.x=0
+            ob.location.y=0
+            ob.location.z=0
             
-            ob.matrix_world = orig_loc_mat @ orig_rot_mat @ orig_scale_mat
-            ob.data.transform(ob.matrix_world)
-            ob.matrix_world = Matrix()
-            
-        # origin setting
-        obj_objects = bpy.context.scene.objects # all objects
-        
-        bpy.ops.object.select_all(action='DESELECT')
-        bpy.ops.object.select_by_type(type=item)
-        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-        
-        # move to 0,0 - this is old magic
-        obs = context.selected_objects
-        o_calc = sum((obj.matrix_world.translation for obj in obs),Vector()) / len(obs)         
-        
-        bpy.ops.object.empty_add(location=o_calc)
-        
-        mt = context.object
-        mwi = mt.matrix_world.inverted()
-
-        for ob in obs:
-            ob.parent = mt
-            # alter ob.matrix_local
-            ob.matrix_local = mwi @ ob.matrix_world
-
-        mt.location = (0, 0, 0)
-        bpy.data.objects.remove(mt)
-        
-        
-        #bpy.ops.transform.resize(value=(0.002,0.002,0.002))
-        #bpy.ops.object.transform_apply(scale=True)
-
         # clear unneccesary objects
         for o in bpy.context.scene.objects: #Remove all lights and cameras - we make new ones
             if o.type in ['CAMERA','LIGHT','EMPTY']:
@@ -352,16 +317,16 @@ class ImportGEO_Scene(bpy.types.Operator, ImportHelper):
 
 # Only needed if you want to add into a dynamic menu
 def menu_func_import(self, context):
-    self.layout.operator(ImportGEO_Scene.bl_idname, text="Import GeoScene (.obj,.tif)")
+    self.layout.operator(raster_hill_import.bl_idname, text="Hillshade Raster Import (.tif)")
 
 
 def register():
-    bpy.utils.register_class(ImportGEO_Scene)
+    bpy.utils.register_class(raster_hill_import)
     bpy.types.TOPBAR_MT_file_import.append(menu_func_import)
 
 
 def unregister():
-    bpy.utils.unregister_class(ImportGEO_Scene)
+    bpy.utils.unregister_class(raster_hill_import)
     bpy.types.TOPBAR_MT_file_import.remove(menu_func_import)
 
 
