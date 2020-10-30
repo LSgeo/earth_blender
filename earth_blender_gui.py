@@ -68,13 +68,88 @@ class import_geo_objects(bpy.types.Operator, ImportHelper):
     filename_ext = ".obj"
 
     filter_glob: StringProperty(
-        default= "*.obj",
+        default= "*.tif;*.obj",
         options={'HIDDEN'},
     )
 
     # Selected files
     files: CollectionProperty(type=bpy.types.PropertyGroup)
 
+    
+    def create_custom_mesh(self,file_name):
+        raster = rasterio.open(file_name)
+        objname = raster.name.split(sep='/')[-1] # set object name to file name
+        r_bounds = list(raster.bounds) # get tif bounds
+
+        # Define arrays for holding data    
+        myvertex = []
+        myfaces = []
+
+        # Create vertices from geotiff bounds
+        myvertex.extend([(r_bounds[0], r_bounds[1], 0.0)])
+        myvertex.extend([(r_bounds[2], r_bounds[1], 0.0)])
+        myvertex.extend([(r_bounds[0], r_bounds[3], 0.0)])
+        myvertex.extend([(r_bounds[2], r_bounds[3], 0.0)])
+
+        # Create all Faces
+        myface = [(0, 1, 3, 2)]
+        myfaces.extend(myface)
+
+        mymesh = bpy.data.meshes.new(objname)
+        myobject = bpy.data.objects.new(objname, mymesh)
+        mymesh.from_pydata(myvertex, [], myfaces)
+        mymesh.update(calc_edges=True)
+
+        ## load image as texture
+        
+        
+        # define a new material
+        mat = bpy.data.materials.new(name=objname) # name it based on the image used to make it
+        mat.use_nodes = True
+        
+        # get all the material nodes
+        mat_nodes = mat.node_tree.nodes
+        
+        # make some nodes
+        texPbsdf = mat_nodes["Principled BSDF"]
+        texImage = mat_nodes.new('ShaderNodeTexImage')
+        texMappi = mat_nodes.new('ShaderNodeMapping')
+        texCoord = mat_nodes.new('ShaderNodeTexCoord')
+            
+        # link the nodes
+        mat.node_tree.links.new(texPbsdf.inputs['Base Color'], texImage.outputs['Color'])
+        mat.node_tree.links.new(texImage.inputs['Vector'], texMappi.outputs['Vector'])
+        mat.node_tree.links.new(texMappi.inputs['Vector'], texCoord.outputs['Object'])
+        
+        # populate our nodes fields as necessary using math and other things
+        texImage.image = bpy.data.images.load(file_name)
+        
+        # we want to transform the texture in a way that makes sense for our plane
+        # thus we need two sets of dimensions
+        # image resolution
+        iw = raster.width
+        ih = raster.height
+        
+        # geo extent
+        rw = r_bounds[2] - r_bounds[0]
+        rh = r_bounds[3] - r_bounds[1]
+        
+        w_scale = iw/rw
+        h_scale = ih/rh
+
+        texMappi.vector_type = "POINT"
+        
+        # define bottom left point relative to center of geometry in blender units
+        w_loc = -iw/2
+        h_loc = -ih/2
+        
+        texMappi.inputs[1].default_value = (w_loc,h_loc,0) # location
+        texMappi.inputs[3].default_value = ((w_scale/iw),(h_scale/ih),0) # scale
+
+        # assign to our object
+        myobject.data.materials.append(mat)
+        
+        return(myobject,raster)
 
     def draw(self, context):
         layout = self.layout
@@ -87,12 +162,34 @@ class import_geo_objects(bpy.types.Operator, ImportHelper):
         row = box.row()
         row.prop(self, "split_mode_setting", expand=True)
 
+        row = box.row()
+        if self.split_mode_setting == 'ON':
+            row.label(text="Split by:")
+            row.prop(self, "split_objects_setting")
+            row.prop(self, "split_groups_setting")
+        else:
+            row.prop(self, "groups_as_vgroups_setting")
+
+        row = layout.split()
+        row.prop(self, "clamp_size_setting")
+        layout.prop(self, "axis_forward_setting")
+        layout.prop(self, "axis_up_setting")
+
+        layout.prop(self, "image_search_setting")
+
+        row = layout.split()
+        row.prop(self, "scale_setting")
+        row.prop(self, "center_origin")
+
     def execute(self, context):
         obs = context.selected_objects
         bpy.ops.object.delete()
         C = bpy.context
         # get the folder
         folder = (os.path.dirname(self.filepath))
+        
+        r_objs = []
+        r_rios = []
         
         
         # perform imports for all files
@@ -102,6 +199,15 @@ class import_geo_objects(bpy.types.Operator, ImportHelper):
             path_to_file = (os.path.join(folder, i.name))
 
             _, file_ext = os.path.splitext(path_to_file)
+                    
+            # load tifs
+            if file_ext==".tif": 
+                myobj,raster = self.create_custom_mesh(str(path_to_file))
+                scene = context.scene
+                scene.collection.objects.link(myobj)
+                # append to list for other processing
+                r_objs.append(myobj)
+                r_rios.append(raster)
             
             # loading the objs
             if file_ext==".obj":     
@@ -178,7 +284,7 @@ class import_hil_ras(bpy.types.Operator, ImportHelper):
     bl_options = {'PRESET', 'UNDO'}
 
     # ImportHelper mixin class uses this
-    filename_ext = ".tif"
+    filename_ext = ".obj"
 
     filter_glob: StringProperty(
         default= "*.tif",
@@ -364,7 +470,7 @@ def register():
     bpy.utils.register_class(earth_blender_menu)
     
     #menus
-    bpy.types.VIEW3D_MT_editor_menus.append(earth_blender_menu)
+    bpy.types.VIEW3D_MT_editor_menus.append(add_gis_menu)
 
     #shortcuts
     if not bpy.app.background: #no ui when running as background
@@ -382,10 +488,10 @@ def unregister():
     icons_dir = os.path.join(os.path.dirname(__file__), "icons")
 
 
-    bpy.utils.unregister_class(earth_blender_menu)
+    bpy.utils.register_class(earth_blender_menu)
     
     #menus
-    bpy.types.VIEW3D_MT_editor_menus.remove(earth_blender_menu)
+    bpy.types.VIEW3D_MT_editor_menus.remove(add_gis_menu)
 
     #shortcuts
     if not bpy.app.background: #no ui when running as background
