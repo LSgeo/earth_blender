@@ -2,7 +2,7 @@
 ---
 Earth blender builds on the standard blender install with a few additonal dependancies.
 
-1. Installing Blender
+## 1 - Installing Blender
 
 Blender can be easily downloaded and installed from [here](https://www.blender.org/download/).
 Once installed you'll need to launch blender. You'll be greeted with a screen like this.
@@ -24,7 +24,8 @@ Blender comes packaged with a version of python which can change depending on yo
  
  Take note of the numbers that appear hear on your blender version, they'll be needed in the next step.
 
-2. Download Python Dependencies
+---
+## 2 - Download Python Dependencies
 
 The version of python bundled with blender comes with some modules pre-installed.
 Our plugin however uses some extra python modules we'll need to install.
@@ -47,7 +48,8 @@ Thus we need numpy‑1.19.2+mkl‑cp37‑cp37m‑win_amd64.whl
 
 Repeat this for gdal and rasterio, once you have all the whl files downloaded move onto the next step.
 
-3. Installing Python Dependencies
+---
+## 3 - Installing Python Dependencies
 
 Navigate to the blender install directory where X.XX is the blender version number.
 
@@ -63,4 +65,5 @@ Then run the following three commands, where the file name is replaced with your
 
 >python.exe -m pip install RASTERIO_FILENAME.whl
 
-4. Installing Earth Blender Tools
+---
+## 4 - Installing Earth Blender
