@@ -8,6 +8,10 @@ _____________
 
 ## Hillshades
 In our *Hillshades* folder, you can learn to create rendered hillshades such as ![the Australia region gravity compilation 2019](Data/Repo_Resources/Aus_B7.png)
+
+and
+
+![elevation shaded geology maps](https://github.com/LSgeo/earth_blender/blob/develop/Hillshades/BIlla_Kalina_geo_map.png)
 __________
 
 
