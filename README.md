@@ -18,5 +18,11 @@ __________
 
 
 ## Fluid Visualisation
-![](https://github.com/LSgeo/earth_blender/blob/develop/04.ExampleData/fluid_animation.gif)
+These visualisations are simplistic examples of how real geological structures can be used to create compelling visualisations.
+![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_animation.gif)
 
+The blend files provided can be used to generate higher resolution examples as well as to play around with fluid source and direction.
+![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_still_1.png)
+
+
+![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_still_2.png)
