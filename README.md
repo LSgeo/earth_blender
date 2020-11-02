@@ -11,10 +11,12 @@ In our *Hillshades* folder, you can learn to create rendered hillshades such as 
 
 and
 
-![elevation shaded geology maps](https://github.com/LSgeo/earth_blender/blob/develop/Hillshades/BIlla_Kalina_geo_map.png)
+![elevation shaded geology maps](https://github.com/LSgeo/earth_blender/blob/develop/01.Hillshades/BIlla_Kalina_geo_map.png)
 
-and ![geophysical data](https://github.com/LSgeo/earth_blender/blob/develop/Hillshades/Lineament_density.png)
+and ![geophysical data](https://github.com/LSgeo/earth_blender/blob/develop/01.Hillshades/Lineament_density.png)
 __________
 
 
 ## Fluid Visualisation
+![](https://github.com/LSgeo/earth_blender/blob/develop/04.ExampleData/fluid_animation.gif)
+
