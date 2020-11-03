@@ -7,22 +7,24 @@ Helper files to use Blender for geoscience visualisation and integration.
 _____________
 
 ## Hillshades
-In our *Hillshades* folder, you can learn to create rendered hillshades such as ![the Australia region gravity compilation 2019](Data/Repo_Resources/Aus_B7.png)
+In our *Hillshades* folder, you can learn to create rendered hillshades such as  
+![the Australia region gravity compilation 2019](04.Example_Data/Repo_Resources/Aus_B7.png)
 
 and
 
-![elevation shaded geology maps](https://github.com/LSgeo/earth_blender/blob/develop/01.Hillshades/BIlla_Kalina_geo_map.png)
+![elevation shaded geology maps](01.Hillshades/BIlla_Kalina_geo_map.png)
 
-and ![geophysical data](https://github.com/LSgeo/earth_blender/blob/develop/01.Hillshades/Lineament_density.png)
+and  
+![geophysical data](01.Hillshades/Lineament_density.png)
 __________
 
 
 ## Fluid Visualisation
-These visualisations are simplistic examples of how real geological structures can be used to create compelling visualisations.
-![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_animation.gif)
+These visualisations are simplistic examples of how real geological structures can be used to create compelling visualisations.  
+![](04.Example_Data/Repo_Resources/fluid_animation.gif)
 
-The blend files provided can be used to generate higher resolution examples as well as to play around with fluid source and direction.
-![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_still_1.png)
+The blend files provided can be used to generate higher resolution examples as well as to play around with fluid source and direction.  
+![](04.Example_Data/Repo_Resources/fluid_still_1.png)
 
 
-![](https://github.com/LSgeo/earth_blender/blob/develop/04.Example_Data/Repo_Resources/fluid_still_2.png)
+![](04.Example_Data/Repo_Resources/fluid_still_2.png)
