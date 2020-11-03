@@ -1,4 +1,4 @@
-![banner](https://github.com/LSgeo/earth_blender/blob/main/Data/Repo_Resources/banner_placeholder.jpg)
+![banner](04.Example_Data/Repo_Resources/banner_placeholder.jpg)
 
 # Earth Blender
 Helper files to use Blender for geoscience visualisation and integration.
