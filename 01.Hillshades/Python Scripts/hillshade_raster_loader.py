@@ -255,8 +255,6 @@ class raster_hill_import(bpy.types.Operator, ImportHelper):
         row.prop(self, "center_origin")
 
     def execute(self, context):
-        obs = context.selected_objects
-        bpy.ops.object.delete()
         C = bpy.context
         # get the folder
         folder = (os.path.dirname(self.filepath))
@@ -278,37 +276,41 @@ class raster_hill_import(bpy.types.Operator, ImportHelper):
                 myobj,raster = self.create_custom_mesh(str(path_to_file))
                 scene = context.scene
                 scene.collection.objects.link(myobj)
-                # append to list for other processing
-                r_objs.append(myobj)
-                r_rios.append(raster)
-                                       
-        ## other processing   
-        item='MESH'
-        bpy.ops.object.select_all(action='DESELECT')             
-        bpy.ops.object.select_by_type(type=item)
-        obs = context.selected_objects
-        for ob in obs:
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
-            ob.scale.x = 0.0002
-            ob.scale.y = 0.0002
-            ob.location.x=0
-            ob.location.y=0
-            ob.location.z=0
-            
-        # clear unneccesary objects
+                bpy.data.objects[myobj.name].select_set(True)
+                bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY',center='BOUNDS')
+                
+
+            if file_ext==".obj":     
+                # call obj operator and assign ui values
+                bpy.ops.import_scene.obj(filepath=path_to_file,
+                                         axis_forward=self.axis_forward_setting,
+                                         axis_up=self.axis_up_setting,
+                                         use_edges=self.edges_setting,
+                                         use_smooth_groups=self.smooth_groups_setting,
+                                         use_split_objects=self.split_objects_setting,
+                                         use_split_groups=self.split_groups_setting,
+                                         use_groups_as_vgroups=self.groups_as_vgroups_setting,
+                                         use_image_search=self.image_search_setting,
+                                         split_mode=self.split_mode_setting,
+                                         global_clight_size=self.clamp_size_setting)
+
+                if self.center_origin:
+                    bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+                
+                bpy.ops.transform.resize(value=(self.scale_setting, self.scale_setting, self.scale_setting), constraint_axis=(False, False, False))
+                bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+        
         for o in bpy.context.scene.objects: #Remove all lights and cameras - we make new ones
-            if o.type in ['CAMERA','LIGHT','EMPTY']:
-                o.select_set(True)
+            if o.type == 'CAMERA' or o.type == "LIGHT":
+               o.select_set(True)
             else:
                 o.select_set(False)
+            bpy.ops.object.delete()
         
-        bpy.ops.object.delete()
-
-
         #Add new sun and ortho camera at origin
         bpy.ops.object.light_add(type="SUN", location=(0.0, 0.0, 10.0))
         C.object.data.energy = 5  
-
+        
         bpy.ops.object.camera_add(location=(0.0, 0.0, 20.0))
         C.object.data.type="ORTHO"
         

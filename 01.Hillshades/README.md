@@ -34,11 +34,11 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
      b. The hillshade needs to be using raw data values, normalised as an unsigned 16 bit integer (1 channel, 0-65535)
 5. Adjust the *Scale* parameter in the *Displacement* node (purple box) until the heightmap is suitably scaled for your data. 
 6. Adjust remaining settings for the green texture box to adjust the appearance of the rendered surface.
-7. Adjust scene *Render Properties* (camera icon in right hand menu) to set the *Render Engine* to *Cycles* and *Feature Set* to *Experimental*. Optionally set Device to GPU Compute.
+7. Adjust scene *Render Properties* (camera icon in right hand menu) to set the *Render Engine* to *Cycles* and *Feature Set* to *Experimental*. Optionally set Device to GPU Compute (if greyed out, adjust Blender's system settings to use CUDA).
 8. Process the render using the Render drop down menu (or press F12)
 
 
 ## Notes:
 * Consider adjusting the sun angle with the Light object in Blender. Angle the "sun" so that the black line light path is perpendicular to the dominant strike, by adjusting the Light objects *Location* and *Rotation* parameters (Orange square)
 
-* See https://data.sarig.sa.gov.au/downloads/mapsheets/250k/SH5307.pdf for the original PDF version of Billa Kalina 250K geology
+* See https://data.sarig.sa.gov.au/downloads/mapsheets/250k/SH5307.pdf for the original PDF version of Billa Kalina 250K geology map
