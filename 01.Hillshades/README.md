@@ -6,7 +6,7 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
 ## GIS Step
 1. Download your geoscience data of choice and import into your favorite GIS package
 2. Normalise the data for the 3D displacement between 0 and 65535, and save as a UINT16 tif
-     > In QGIS: *Raster>Conversion>Translate (Convert Format)*, and under *Advanced>Additional command-line parameters*, insert `-scale <your_data_min>, <your_data_max>, 1, 65535`, then select *Output Data type*: *UInt16*). Also set the output nodata value to 0.
+     > In QGIS: *Raster>Conversion>Translate (Convert Format)*, and under *Advanced>Additional command-line parameters*, insert `-scale <your_data_min>  <your_data_max> 1 65535`, then select *Output Data type*: *UInt16*). Also set the output nodata value to 0.
  
     a. If you are using the same data for the surface colouring:  
         i. Apply a colour map. [I recommened Perceptually Uniform Colour Maps](https://peterkovesi.com/projects/colourmaps/index.html)
