@@ -38,7 +38,9 @@ def gdal_convert_raster(raster_path):
     ## Create colourmap file
     array = band.ReadAsArray()
     array = (array - array.min()) / (array.max() - array.min())  # Normalise to [0, 1]
-    image = Image.fromarray(np.uint8(cc.cm.CET_R1(array, bytes=True)))
+    im_array = np.uint8(cc.cm.CET_L1(array, bytes=True))[:, :, :3]
+    image = Image.fromarray(im_array, mode="RGB")
+    image.save(str(colourmap_file_path))
 
     print(
         f"Converted:\n{str(raster_path)}\n"
@@ -46,4 +48,4 @@ def gdal_convert_raster(raster_path):
     )
 
 
-gdal_convert_raster("C:\Luke\Vzz\ERS\TMI_RTP_200_Vzz.ers")
+gdal_convert_raster(raster_path="C:\Luke\Vzz\ERS\TMI_RTP_200_Vzz.ers")
