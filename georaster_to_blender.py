@@ -1,19 +1,17 @@
 def gdal_convert_raster(raster_path):
     """Convert input geo raster and output files ready for blender rendering.
-
     This means we output two tifs:
      - A UINT16 file for the height map
      - A RGB colourmap of the same extent
-
     TODO:
      - gdalWarp to reproject
      - use cutline argument in Warp to crop to cutline.
-
     """
     from pathlib import Path
 
     import colorcet as cc
-    import gdal
+    from osgeo import gdal
+
     import numpy as np
     from PIL import Image
 
@@ -37,15 +35,22 @@ def gdal_convert_raster(raster_path):
 
     ## Create colourmap file
     array = band.ReadAsArray()
-    array = (array - array.min()) / (array.max() - array.min())  # Normalise to [0, 1]
-    im_array = np.uint8(cc.cm.CET_L1(array, bytes=True))[:, :, :3]
+    nan_val = band.GetNoDataValue()
+    mask = array == nan_val
+    array[mask] = np.nan
+    array = (array - np.nanmin(array)) / (np.nanmax(array) - np.nanmin(array))
+    im_array = np.uint8(cc.cm.CET_L1(array, bytes=True))[:, :, :3]  # remove alpha
+    # im_array[mask] = [0, 0, 0]
     image = Image.fromarray(im_array, mode="RGB")
     image.save(str(colourmap_file_path))
 
     print(
         f"Converted:\n{str(raster_path)}\n"
-        f"into hillshade and colourmap, located in:\n{desired_file_path}\n"
+        f"into hillshade and colourmap, located in:\n{colourmap_file_path.parent}\n"
     )
 
 
-gdal_convert_raster(raster_path="C:\Luke\Vzz\ERS\TMI_RTP_200_Vzz.ers")
+gdal_convert_raster(
+    raster_path=r"O:\Grids_Rendering_NGEA\03_Grids\70359_tmi_rtp_2vd.ers"
+)
+
