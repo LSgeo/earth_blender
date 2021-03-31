@@ -53,4 +53,3 @@ def gdal_convert_raster(raster_path):
 gdal_convert_raster(
     raster_path=r"O:\Grids_Rendering_NGEA\03_Grids\70359_tmi_rtp_2vd.ers"
 )
-
