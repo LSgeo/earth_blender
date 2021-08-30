@@ -40,5 +40,6 @@ You can visualise a single data layer coloured using a colourmap, or integrate d
 
 ## Notes:
 * Consider adjusting the sun angle with the Light object in Blender. Angle the "sun" so that the black line light path is perpendicular to the dominant strike, by adjusting the Light objects *Location* and *Rotation* parameters (Orange square)
-
+* Blender guide based on https://somethingaboutmaps.wordpress.com/2017/11/16/creating-shaded-relief-in-blender/
 * See https://data.sarig.sa.gov.au/downloads/mapsheets/250k/SH5307.pdf for the original PDF version of Billa Kalina 250K geology map
+
